@@ -1,0 +1,131 @@
+name: Build IPA
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode.app
+
+    - name: Create Xcode Project Structure
+      run: |
+        mkdir -p systme/systme.xcodeproj
+        mkdir -p systme/systme
+
+        # Copy Swift source
+        cp ContentView.swift systme/systme/ContentView.swift
+
+        # Create App entry point
+        cat > systme/systme/systmeApp.swift << 'EOF'
+        import SwiftUI
+        @main
+        struct systmeApp: App {
+            var body: some Scene {
+                WindowGroup {
+                    ContentView()
+                }
+            }
+        }
+        EOF
+
+        # Create Info.plist
+        cat > systme/systme/Info.plist << 'EOF'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>CFBundleName</key>
+            <string>systme</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.emex.systme</string>
+            <key>CFBundleVersion</key>
+            <string>1</string>
+            <key>CFBundleShortVersionString</key>
+            <string>1.0</string>
+            <key>CFBundleExecutable</key>
+            <string>systme</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>LSRequiresIPhoneOS</key>
+            <true/>
+            <key>UILaunchScreen</key>
+            <dict/>
+            <key>UISupportedInterfaceOrientations</key>
+            <array>
+                <string>UIInterfaceOrientationPortrait</string>
+            </array>
+        </dict>
+        </plist>
+        EOF
+
+    - name: Generate project.pbxproj
+      run: |
+        cd systme
+        cat > systme.xcodeproj/project.pbxproj << 'PBXEOF'
+        // !$*UTF8*$!
+        {
+          archiveVersion = 1;
+          classes = {};
+          objectVersion = 56;
+          objects = {
+            A1000001 = {isa = PBXBuildFile; fileRef = A1000011; };
+            A1000002 = {isa = PBXBuildFile; fileRef = A1000012; };
+            A1000003 = {isa = PBXBuildFile; fileRef = A1000013; };
+            A1000011 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = systme/ContentView.swift; sourceTree = SOURCE_ROOT; };
+            A1000012 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = systmeApp.swift; path = systme/systmeApp.swift; sourceTree = SOURCE_ROOT; };
+            A1000013 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = systme/Info.plist; sourceTree = SOURCE_ROOT; };
+            A1000020 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = systme.app; sourceTree = BUILT_PRODUCTS_DIR; };
+            A1000030 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+            A1000040 = {isa = PBXGroup; children = (A1000011, A1000012, A1000013,); name = systme; sourceTree = "<group>"; };
+            A1000041 = {isa = PBXGroup; children = (A1000020,); name = Products; sourceTree = "<group>"; };
+            A1000042 = {isa = PBXGroup; children = (A1000040, A1000041,); sourceTree = "<group>"; };
+            A1000050 = {isa = PBXNativeTarget; buildConfigurationList = A1000070; buildPhases = (A1000060, A1000030,); buildRules = (); dependencies = (); name = systme; productName = systme; productReference = A1000020; productType = "com.apple.product-type.application"; };
+            A1000060 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A1000001, A1000002,); runOnlyForDeploymentPostprocessing = 0; };
+            A1000065 = {isa = PBXProject; attributes = {LastSwiftUpdateCheck = 1500; LastUpgradeCheck = 1500; }; buildConfigurationList = A1000075; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base,); mainGroup = A1000042; productRefGroup = A1000041; projectDirPath = ""; projectRoot = ""; targets = (A1000050,); };
+            A1000070 = {isa = XCConfigurationList; buildConfigurations = (A1000071, A1000072,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+            A1000071 = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_IDENTITY = ""; CODE_SIGNING_ALLOWED = NO; CODE_SIGNING_REQUIRED = NO; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = systme/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 16.0; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks"; MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = "com.emex.systme"; PRODUCT_NAME = systme; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; }; name = Debug; };
+            A1000072 = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_IDENTITY = ""; CODE_SIGNING_ALLOWED = NO; CODE_SIGNING_REQUIRED = NO; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = systme/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 16.0; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks"; MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = "com.emex.systme"; PRODUCT_NAME = systme; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; }; name = Release; };
+            A1000075 = {isa = XCConfigurationList; buildConfigurations = (A1000076, A1000077,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+            A1000076 = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; }; name = Debug; };
+            A1000077 = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; }; name = Release; };
+          };
+          rootObject = A1000065;
+        }
+        PBXEOF
+
+    - name: Build Archive
+      run: |
+        cd systme
+        xcodebuild archive \
+          -project systme.xcodeproj \
+          -scheme systme \
+          -destination "generic/platform=iOS" \
+          -archivePath ./systme.xcarchive \
+          CODE_SIGNING_ALLOWED=NO \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGN_IDENTITY="" \
+          | xcpretty
+
+    - name: Package IPA (unsigned)
+      run: |
+        cd systme
+        mkdir -p Payload
+        cp -r systme.xcarchive/Products/Applications/systme.app Payload/
+        zip -r systme.ipa Payload
+        echo "✅ IPA created!"
+
+    - name: Upload IPA
+      uses: actions/upload-artifact@v4
+      with:
+        name: systme-ipa
+        path: systme/systme.ipa
+        retention-days: 30
